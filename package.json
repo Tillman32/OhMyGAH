@@ -1,5 +1,5 @@
 {
-  "name": "@tillman32/ohmygah",
+  "name": "ohmygah",
   "version": "0.1.0",
   "bin": {
     "omg": "./dist/index.js"
