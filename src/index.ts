@@ -5,7 +5,6 @@ import { swap } from "./commands/swap";
 
 async function main(args: string[] = process.argv): Promise<void> {
     const program = new Command();
-    console.log(args)
 
     program
         .name("Oh My GitHub Actions Helper")
