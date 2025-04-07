@@ -8,7 +8,7 @@ on:
       - bugfix/*
 
 jobs:
-  publish:
+  ci:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -18,5 +18,7 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org/'
+      - name: Install dependencies
+        run: npm install
       - name: Build
         run: npm run build
