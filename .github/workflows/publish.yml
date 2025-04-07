@@ -1,4 +1,4 @@
-name: "Publish package to npmjs.com package registry"
+name: "Publish package"
 
 on: 
     pull_request:
