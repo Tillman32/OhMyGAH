@@ -1,5 +1,5 @@
 {
-  "name": "ohmygah",
+  "name": "@tillman32/ohmygah",
   "version": "0.1.0",
   "bin": {
     "omg": "./dist/index.js"
@@ -9,10 +9,20 @@
     "start": "npx ts-node src/index.ts",
     "test": "jest"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
-  "description": "",
+  "keywords": [
+    "cli",
+    "github",
+    "actions",
+    "workflows",
+    "github-actions",
+    "github-workflows",
+    "actions version swap"
+  ],
+  "author": "Brandon Tillman (brandontillman.com)",
+  "license": "MIT",
+  "description": "A command line tool to help developer experience for GitHub Actions & Workflows",
+  "repository": "https://github.com/Tillman32/OhMyGAH",
+  "homepage": "https://github.com/Tillman32/OhMyGAH#readme",
   "dependencies": {
     "commander": "^13.1.0",
     "glob": "^11.0.1",
