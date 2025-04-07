@@ -56,7 +56,7 @@ async function replaceActionVersionInFiles(files: string[], action: string, vers
         lines.forEach((line, index) => {
             if (line.includes('uses:')) {
                 // Replace the action version
-                const newLine = line.replace(/(uses:\s*['"]?.*?)(@[^'"]*)/, `$1@${version}`);
+                const newLine = line.replace(new RegExp(`(uses:\\s*['"]?${action})(@[^'"]*)`), `$1@${version}`);
                 lines[index] = newLine;
             }
         });
