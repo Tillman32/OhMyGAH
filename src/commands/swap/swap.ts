@@ -48,6 +48,8 @@ export async function swap(program: Command) : Promise<Command> {
 async function replaceActionVersionInFiles(files: string[], action: string, version: string) {
     console.log(`Replacing version of action ${action} to ${version}`);
 
+    const escapedAction = action.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); // Escape special regex characters
+
     // Iterate through each file and search for the pattern 'uses:'
     files.forEach(file => {
         const fileContent = fs.readFileSync(file, 'utf-8');
@@ -56,7 +58,7 @@ async function replaceActionVersionInFiles(files: string[], action: string, vers
         lines.forEach((line, index) => {
             if (line.includes('uses:')) {
                 // Replace the action version
-                const newLine = line.replace(/(uses:\s*['"]?.*?)(@[^'"]*)/, `$1@${version}`);
+                const newLine = line.replace(new RegExp(`(uses:\\s*['"]?${escapedAction})(@[^'"]*)`), `$1@${version}`);
                 lines[index] = newLine;
             }
         });
