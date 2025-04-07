@@ -2,7 +2,9 @@
   "name": "ohmygah",
   "version": "0.2.0",
   "bin": {
-    "omg": "./dist/index.js"
+    "gah": "./dist/index.js",
+    "omg": "./dist/index.js",
+    "ohmygah": "./dist/index.js"
   },
   "scripts": {
     "build": "npx tsc --outDir dist",

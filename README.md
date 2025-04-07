@@ -5,7 +5,7 @@
 To install OhMyGAH, use the following command:
 
 ```bash
-npm install ohmygah
+npm install -g ohmygah
 ```
 
 ### Usage
