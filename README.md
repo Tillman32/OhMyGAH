@@ -1,6 +1,6 @@
-### OhMyGAH (Oh my GitHub Actions Helper)
+## OhMyGAH (Oh my GitHub Actions Helper)
 
-## Installation
+### Installation
 
 To install OhMyGAH, use the following command:
 
@@ -8,7 +8,7 @@ To install OhMyGAH, use the following command:
 npm install ohmygah
 ```
 
-## Usage
+### Usage
 
 OhMyGAH provides a command-line interface and is invoked using `omg`. For a list of available commands, type:
 
@@ -23,3 +23,10 @@ omg -h
 | `omg -h, --help`         | Displays help information.                   |
 | `omg -V, --version`      | Shows the version information.               |
 | `omg swap <action> <tag>`| Swaps the specified action to use the given version tag. |
+
+### Examples
+
+#### Update actions/checkout from @v2 to @v3
+```bash
+omg swap actions/checkout @v3
+```
