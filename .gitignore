@@ -1,0 +1,9 @@
+# Editor files
+.vscode
+.idea
+
+# Language files
+node_modules
+
+# Generated files
+dist
