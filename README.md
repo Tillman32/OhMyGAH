@@ -1,4 +1,4 @@
-## OhMyGAH (Oh my GitHub Actions Helper)
+## OhMyGAH (Oh My GitHub Actions Helper)
 
 ### Installation
 
