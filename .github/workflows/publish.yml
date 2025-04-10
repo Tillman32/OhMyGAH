@@ -1,11 +1,9 @@
 name: "Publish package"
 
 on: 
-    pull_request:
-        types:
-            - closed
-        branches:
-            - main
+  push: 
+    branches:
+      - main
 
 jobs:
   publish:
@@ -22,3 +20,22 @@ jobs:
         run: npm publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      - name: Get package version
+        id: get_version
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> $
+      - name: Zip app for release
+        run: |
+          zip -r release.zip ${GITHUB_WORKSPACE}
+      - name: Create Release
+        id: create_release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: v${{ env.VERSION }}
+          name: Release v${{ env.VERSION }}
+          body: Release notes for v${{ env.VERSION }}
+          files: |
+            dist/*.js
+            dist/*.js.map
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ steps.get_version.outputs.version }}
