@@ -23,6 +23,7 @@ omg -h
 | `omg -h, --help`         | Displays help information.                   |
 | `omg -V, --version`      | Shows the version information.               |
 | `omg swap <action> <tag>`| Swaps the specified action to use the given version tag. |
+| `omg list`               | Lists all available GitHub Actions in the repository. |
 
 ### Examples
 
