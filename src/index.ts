@@ -1,30 +1,25 @@
 #!/usr/bin/env node
-const pkg = require("../package.json");
-import { Command } from "commander";
-import { swap } from "./commands/swap";
+import "reflect-metadata";
+import { Command } from "@commander-js/extra-typings";
+import { container } from "tsyringe";
+import { ActionsWorkflowService } from "./services/workflow-service";
+import { Main }  from "./main";
+import { List } from "./commands/list";
+import { Swap } from "./commands/swap";
 
-async function main(args: string[] = process.argv): Promise<void> {
-    const program = new Command();
+// Create a new Command instance
+const program = new Command();
 
-    program
-        .name("Oh My GitHub Actions Helper")
-        .description("A CLI tool to help with GitHub Actions workflows")
-        .version(pkg.version);
+// Register services
+container.registerInstance("ActionsWorkflowService", new ActionsWorkflowService());
 
-        (async (): Promise<void> => {
-            try {
-                // Register program commands here
-                await swap(program);
-            } catch (error) {
-                console.error("An error occurred:", error);
-                process.exit(1); // Exit with a failure code
-            }
-        })();
+// Register commands
+container.registerInstance("List", new List());
+container.registerInstance("Swap", new Swap());
 
-    await program.parseAsync(args);
-}
-
-main().catch((error) => {
-    console.error("An error occurred:", error);
-    process.exit(1); // Exit with a failure code
-}); 
+Main(program)
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error('Error:', error);
+    process.exit(1);
+  });
