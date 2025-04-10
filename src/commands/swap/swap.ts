@@ -4,21 +4,39 @@ import { container, injectable } from "tsyringe";
 import { ActionsWorkflow, ActionsWorkflowService } from "../../services/workflow-service";
 
 export interface Swap {
-    initialize(): Promise<void>;
+    run(action: string, version: string): Promise<void>;
 }
 
 @injectable()
 export class Swap {
-    async run(): Promise<void> {
-        let actionName = "";
-        let actionVersion = "";
+    async run(action: string, version: string): Promise<void> {
+        // Promt user if no input is provided
+        if(!action || !version) {
+            const prompt = await inquirer.prompt([
+                {
+                    type: "input",
+                    name: "action",
+                    message: "Enter action name (eg; actions/checkout)"
+                },
+                {
+                    type: "input",
+                    name: "version",
+                    message: "Enter version/branch"
+                }
+            ]);
+
+            action = prompt.action;
+            version = prompt.version;
+        }
 
         const workflowService = container.resolve<ActionsWorkflowService>("ActionsWorkflowService");
         const workflows = workflowService.findAllActionsWorkflows();
 
+        console.log(workflows);
+
         const selectedFiles = await this.promptUserToSelectWorkflows(workflows);
 
-        await this.replaceActionVersionInFiles(selectedFiles, actionName, actionVersion);
+        await this.replaceActionVersionInFiles(selectedFiles, action, version);
     }
 
     async replaceActionVersionInFiles(workflows: ActionsWorkflow[], action: string, version: string) {
@@ -28,7 +46,7 @@ export class Swap {
     
         // Iterate through each file and search for the pattern 'uses:'
         workflows.forEach(file => {
-            const fileContent = fs.readFileSync(file.fileName, 'utf-8');
+            const fileContent = fs.readFileSync(file.path, 'utf-8');
             const lines = fileContent.split('\n');
     
             lines.forEach((line, index) => {
@@ -41,8 +59,8 @@ export class Swap {
     
             // Write the updated content back to the file
             const updatedContent = lines.join('\n');
-            fs.writeFileSync(file.fileName, updatedContent, 'utf-8'); // Write the changes back to the file
-            console.log(`Updated file: ${file.fileName}`);
+            fs.writeFileSync(file.path, updatedContent, 'utf-8'); // Write the changes back to the file
+            console.log(`Updated file: ${file.path}`);
         });
     }
     
@@ -52,11 +70,11 @@ export class Swap {
                 type: 'checkbox',
                 name: 'selectedFiles',
                 message: 'Select files to update',
-                choices: workflows.map(workflow => ({ name: workflow.fileName, value: workflow.fileName })),
+                choices: workflows.map(workflow => ({ name: workflow.path, value: workflow.path })),
             },
         ]);
     
-        return workflows.filter(workflow => selectedFiles.includes(workflow.fileName));
+        return workflows.filter(workflow => selectedFiles.includes(workflow.path));
     }
     
 }

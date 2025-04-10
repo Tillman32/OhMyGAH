@@ -15,7 +15,7 @@ let List = class List {
         workflows.forEach(workflow => {
             console.log(`File: ${workflow.fileName}`);
             workflow.actions.forEach(a => {
-                console.log(`  -L${a.lineNumber}: ${a.name}@${a.version}`);
+                console.log(`  -L${a.lineNumber}: ${workflow.path}`);
             });
         });
     }
