@@ -6,10 +6,17 @@
     "omg": "./dist/index.js",
     "ohmygah": "./dist/index.js"
   },
+  "files": [
+    "dist/**/*.js",
+    "!dist/**/*.spec.js",
+    "README.md",
+    "LICENSE"
+  ],
   "scripts": {
     "build": "npx tsc --outDir dist",
     "start": "npx ts-node src/index.ts",
-    "test": "jest"
+    "test": "jest",
+    "prepublishOnly": "npm run build"
   },
   "keywords": [
     "cli",

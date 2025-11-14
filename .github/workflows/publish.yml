@@ -1,4 +1,4 @@
-name: "Publish package"
+name: "Publish package and create release"
 
 on: 
   push: 
@@ -8,34 +8,52 @@ on:
 jobs:
   publish:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      id-token: write
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org/'
-      - name: Publish
-        run: npm publish --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run tests
+        run: npm test
+      
+      - name: Build
+        run: npm run build
+      
       - name: Get package version
         id: get_version
-        run: echo "version=$(node -p \"require('./package.json').version\")" >> $
-      - name: Zip app for release
-        run: |
-          zip -r release.zip ${GITHUB_WORKSPACE}
-      - name: Create Release
-        id: create_release
+        run: echo "version=$(node -p \"require('./package.json').version\")" >> $GITHUB_OUTPUT
+      
+      - name: Publish to npm
+        run: npm publish --provenance --access public
+      
+      - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          tag_name: v${{ env.VERSION }}
-          name: Release v${{ env.VERSION }}
-          body: Release notes for v${{ env.VERSION }}
-          files: |
-            dist/*.js
-            dist/*.js.map
+          tag_name: v${{ steps.get_version.outputs.version }}
+          name: Release v${{ steps.get_version.outputs.version }}
+          body: |
+            ## Installation
+            
+            Install globally:
+            ```bash
+            npm install -g ohmygah@${{ steps.get_version.outputs.version }}
+            ```
+            
+            Or use with npx:
+            ```bash
+            npx ohmygah@${{ steps.get_version.outputs.version }} --help
+            ```
+          generate_release_notes: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          VERSION: ${{ steps.get_version.outputs.version }}
