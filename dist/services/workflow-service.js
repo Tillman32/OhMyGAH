@@ -22,19 +22,30 @@ let ActionsWorkflowService = class ActionsWorkflowService {
         const yamlFiles = this.findAllYamlFiles();
         const workflows = [];
         yamlFiles.forEach(file => {
-            const fileContent = fs_1.default.readFileSync(file, 'utf-8');
-            const lines = fileContent.split('\n');
-            const actions = [];
-            lines.forEach((line, index) => {
-                if (line.includes('uses:')) {
-                    const action = line.split('uses:')[1].trim();
-                    const details = action.split('@');
-                    actions.push({ name: details[0], version: details[1], lineNumber: index + 1 });
-                }
-            });
-            const fileParts = file.match(/([^\\/]+)$/);
-            const fileName = fileParts ? fileParts[0] : '';
-            workflows.push({ fileName: fileName, path: file, actions });
+            try {
+                const fileContent = fs_1.default.readFileSync(file, 'utf-8');
+                const lines = fileContent.split('\n');
+                const actions = [];
+                lines.forEach((line, index) => {
+                    if (line.includes('uses:')) {
+                        const action = line.split('uses:')[1].trim();
+                        const details = action.split('@');
+                        if (details.length >= 2) {
+                            actions.push({
+                                name: details[0],
+                                version: details[1] || '',
+                                lineNumber: index + 1
+                            });
+                        }
+                    }
+                });
+                const fileParts = file.match(/([^\\/]+)$/);
+                const fileName = fileParts ? fileParts[0] : '';
+                workflows.push({ fileName: fileName, path: file, actions });
+            }
+            catch (error) {
+                console.error(`Error reading file ${file}:`, error);
+            }
         });
         return workflows;
     }
