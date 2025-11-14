@@ -34,7 +34,20 @@ jobs:
         id: get_version
         run: |
           version=$(node -p 'require("./package.json").version')
-          echo "version=$version" >> $GITHUB_OUTPUT
+          echo "version=$version" > $GITHUB_OUTPUT
+      
+      - name: Tokenless publish diagnostics
+        run: |
+          echo "Registry: $(npm config get registry)"
+          node --version
+          npm --version
+          echo "=== npm publish --dry-run (provenance) ==="
+          npm publish --dry-run --provenance --access public || true
+          echo "=== npm debug logs (if any) ==="
+          ls -la /home/runner/.npm/_logs || true
+          if ls /home/runner/.npm/_logs/*.log 1> /dev/null 2>&1; then
+            tail -n +1 /home/runner/.npm/_logs/*.log || true
+          fi
       
       - name: Publish to npm
         run: npm publish --provenance --access public
