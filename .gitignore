@@ -4,3 +4,13 @@
 
 # Language files
 node_modules
+
+# Build artifacts
+dist
+
+# Test coverage
+coverage
+
+# Temporary files
+*.log
+.DS_Store

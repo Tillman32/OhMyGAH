@@ -3,7 +3,7 @@ import { Command } from "@commander-js/extra-typings";
 import { container, injectable } from "tsyringe";
 import { List } from "./commands/list";
 import { Swap } from "./commands/swap";
-const pkg = require("../package.json");
+import pkg from "../package.json";
 
 export async function Main(program: Command): Promise<void> {
     program
@@ -15,7 +15,6 @@ export async function Main(program: Command): Promise<void> {
     program
         .command('list')
         .description('Lists all the GitHub Actions Workflows in the current directory.')
-        .argument('[action]', 'The action name to swap (eg; actions/checkout)')
         .action(async () => {
             await listCommand.run();
         });

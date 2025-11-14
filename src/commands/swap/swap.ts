@@ -10,18 +10,30 @@ export interface Swap {
 @injectable()
 export class Swap {
     async run(action: string, version: string): Promise<void> {
-        // Promt user if no input is provided
+        // Prompt user if no input is provided
         if(!action || !version) {
             const prompt = await inquirer.prompt([
                 {
                     type: "input",
                     name: "action",
-                    message: "Enter action name (eg; actions/checkout)"
+                    message: "Enter action name (eg; actions/checkout)",
+                    validate: (input: string) => {
+                        if (!input || input.trim().length === 0) {
+                            return "Action name is required";
+                        }
+                        return true;
+                    }
                 },
                 {
                     type: "input",
                     name: "version",
-                    message: "Enter version/branch"
+                    message: "Enter version/branch",
+                    validate: (input: string) => {
+                        if (!input || input.trim().length === 0) {
+                            return "Version is required";
+                        }
+                        return true;
+                    }
                 }
             ]);
 
@@ -29,12 +41,30 @@ export class Swap {
             version = prompt.version;
         }
 
+        // Validate inputs
+        if (!action || action.trim().length === 0) {
+            console.error("Error: Action name is required");
+            process.exit(1);
+        }
+        if (!version || version.trim().length === 0) {
+            console.error("Error: Version is required");
+            process.exit(1);
+        }
+
         const workflowService = container.resolve<ActionsWorkflowService>("ActionsWorkflowService");
         const workflows = workflowService.findAllActionsWorkflows();
 
-        console.log(workflows);
+        if (workflows.length === 0) {
+            console.log("No GitHub Actions workflows found.");
+            return;
+        }
 
         const selectedFiles = await this.promptUserToSelectWorkflows(workflows);
+
+        if (selectedFiles.length === 0) {
+            console.log("No files selected. Exiting.");
+            return;
+        }
 
         await this.replaceActionVersionInFiles(selectedFiles, action, version);
     }
@@ -46,21 +76,34 @@ export class Swap {
     
         // Iterate through each file and search for the pattern 'uses:'
         workflows.forEach(file => {
-            const fileContent = fs.readFileSync(file.path, 'utf-8');
-            const lines = fileContent.split('\n');
-    
-            lines.forEach((line, index) => {
-                if (line.includes('uses:')) {
-                    // Replace the action version
-                    const newLine = line.replace(new RegExp(`(uses:\\s*['"]?${escapedAction})(@[^'"]*)`), `$1@${version}`);
-                    lines[index] = newLine;
+            try {
+                const fileContent = fs.readFileSync(file.path, 'utf-8');
+                const lines = fileContent.split('\n');
+                let changesMade = false;
+        
+                lines.forEach((line, index) => {
+                    if (line.includes('uses:')) {
+                        // Replace the action version
+                        const newLine = line.replace(new RegExp(`(uses:\\s*['"]?${escapedAction})(@[^'"\s]*)`), `$1@${version}`);
+                        if (newLine !== line) {
+                            lines[index] = newLine;
+                            changesMade = true;
+                        }
+                    }
+                });
+        
+                if (changesMade) {
+                    // Write the updated content back to the file
+                    const updatedContent = lines.join('\n');
+                    fs.writeFileSync(file.path, updatedContent, 'utf-8');
+                    console.log(`Updated file: ${file.path}`);
+                } else {
+                    console.log(`No changes needed for: ${file.path}`);
                 }
-            });
-    
-            // Write the updated content back to the file
-            const updatedContent = lines.join('\n');
-            fs.writeFileSync(file.path, updatedContent, 'utf-8'); // Write the changes back to the file
-            console.log(`Updated file: ${file.path}`);
+            } catch (error) {
+                console.error(`Error processing file ${file.path}:`, error);
+                throw error;
+            }
         });
     }
     
