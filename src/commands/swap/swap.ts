@@ -4,14 +4,17 @@ import { container, injectable } from "tsyringe";
 import { ActionsWorkflow, ActionsWorkflowService } from "../../services/workflow-service";
 
 export interface Swap {
-    run(action: string, version: string): Promise<void>;
+    run(action: string, version: string, filePath?: string): Promise<void>;
 }
 
 @injectable()
 export class Swap {
-    async run(action: string, version: string): Promise<void> {
-        // Prompt user if no input is provided
-        if(!action || !version) {
+    async run(action: string, version: string, filePath?: string): Promise<void> {
+        // Validate inputs first, before prompting
+        const needsPrompt = !action || !version || action.trim().length === 0 || version.trim().length === 0;
+        
+        // Prompt user if no valid input is provided
+        if(needsPrompt) {
             const prompt = await inquirer.prompt([
                 {
                     type: "input",
@@ -41,22 +44,25 @@ export class Swap {
             version = prompt.version;
         }
 
-        // Validate inputs
-        if (!action || action.trim().length === 0) {
-            console.error("Error: Action name is required");
-            process.exit(1);
-        }
-        if (!version || version.trim().length === 0) {
-            console.error("Error: Version is required");
-            process.exit(1);
-        }
-
         const workflowService = container.resolve<ActionsWorkflowService>("ActionsWorkflowService");
-        const workflows = workflowService.findAllActionsWorkflows();
+        let workflows = workflowService.findAllActionsWorkflows();
 
         if (workflows.length === 0) {
             console.log("No GitHub Actions workflows found.");
             return;
+        }
+
+        // Filter to specific file if provided
+        if (filePath) {
+            const filteredWorkflows = workflows.filter(w => w.path === filePath || w.path.endsWith(filePath));
+            if (filteredWorkflows.length === 0) {
+                console.error(`Error: Workflow file '${filePath}' not found.`);
+                console.log(`Available workflows:`);
+                workflows.forEach(w => console.log(`  - ${w.path}`));
+                process.exit(1);
+            }
+            workflows = filteredWorkflows;
+            console.log(`Targeting specific workflow file: ${workflows[0].path}`);
         }
 
         const selectedFiles = await this.promptUserToSelectWorkflows(workflows);
