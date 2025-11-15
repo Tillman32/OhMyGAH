@@ -13,12 +13,11 @@
     "LICENSE"
   ],
   "scripts": {
-    "build": "npx tsc --outDir dist",
+    "build": "npx tsc --outDir dist && chmod +x dist/index.js",
     "start": "npx ts-node src/index.ts",
     "test": "jest",
     "prepublishOnly": "npm run build",
-    "prepack": "npm run build",
-    "postbuild": "chmod +x dist/index.js"
+    "prepack": "npm run build"
   },
   "keywords": [
     "cli",
