@@ -25,8 +25,9 @@ export async function Main(program: Command): Promise<void> {
         .description('Swaps the version of a GitHub Action in all Workflows within the current directory.')
         .argument('[action]', 'The action name to swap (eg; actions/checkout)')
         .argument('[version]', 'The version to swap to (eg; v2.3.4 or feature/xyz)')
-        .action(async (action, version) => {
-            await swapCommand.run(action!, version!);
+        .option('-f, --file <path>', 'Only swap in the specified workflow file')
+        .action(async (action, version, options) => {
+            await swapCommand.run(action!, version!, options.file);
         });
 
     await program.parseAsync(process.argv);    
