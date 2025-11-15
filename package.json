@@ -2,9 +2,9 @@
   "name": "ohmygah",
   "version": "0.3.1",
   "bin": {
-    "gah": "./dist/index.js",
-    "omg": "./dist/index.js",
-    "ohmygah": "./dist/index.js"
+    "gah": "dist/index.js",
+    "omg": "dist/index.js",
+    "ohmygah": "dist/index.js"
   },
   "files": [
     "dist/**/*.js",
@@ -32,7 +32,10 @@
   "author": "Brandon Tillman (brandontillman.com)",
   "license": "MIT",
   "description": "A command line tool to help developer experience for GitHub Actions & Workflows",
-  "repository": "https://github.com/Tillman32/OhMyGAH",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tillman32/OhMyGAH.git"
+  },
   "homepage": "https://github.com/Tillman32/OhMyGAH#readme",
   "dependencies": {
     "@commander-js/extra-typings": "^13.1.0",
